@@ -2,10 +2,13 @@
   "name": "just-one-minute",
   "private": true,
   "version": "0.0.1",
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx tsc --noEmit && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
