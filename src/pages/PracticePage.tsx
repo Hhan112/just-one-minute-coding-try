@@ -12,6 +12,8 @@ import { TranscriptionDisplay } from '../components/practice/TranscriptionDispla
 import { KeywordCanvas } from '../components/practice/KeywordCanvas'
 import { KeywordInput } from '../components/practice/KeywordInput'
 import { usePracticeStore, useUserStore } from '../stores/practiceStore'
+import { useAuthStore } from '../stores/authStore'
+import { syncService } from '../stores/syncService'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useAudioRecorder } from '../hooks/useAudioRecorder'
 import { useTimer } from '../hooks/useTimer'
@@ -133,6 +135,12 @@ export default function PracticePage() {
     if (session) {
       console.log('Session created successfully, navigating to /review')
       recordCheckIn(session)
+
+      // Sync to cloud if authenticated
+      if (useAuthStore.getState().user) {
+        syncService.pushSession(session).catch(console.error)
+      }
+
       navigate('/review', { state: { session } })
     } else {
       console.error('FAILURE: completePractice returned null')

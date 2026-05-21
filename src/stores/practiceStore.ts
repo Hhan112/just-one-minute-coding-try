@@ -89,6 +89,7 @@ interface UserState {
 
   recordCheckIn: (session: SessionData) => void
   getCheckInsForMonth: (year: number, month: number) => CheckIn[]
+  setSyncData: (sessions: SessionData[], checkIns: CheckIn[]) => void
 }
 
 export const useUserStore = create<UserState>()(
@@ -141,6 +142,61 @@ export const useUserStore = create<UserState>()(
         return get().checkIns.filter(c => {
           const d = new Date(c.date)
           return d.getFullYear() === year && d.getMonth() === month
+        })
+      },
+
+      setSyncData: (cloudSessions, cloudCheckIns) => {
+        const existing = get()
+        // Merge sessions: combine cloud + local, dedup by id
+        const sessionMap = new Map<string, SessionData>()
+        for (const s of existing.sessions) sessionMap.set(s.id, s)
+        for (const s of cloudSessions) sessionMap.set(s.id, s)
+        const mergedSessions = Array.from(sessionMap.values())
+          .sort((a, b) => b.completedAt - a.completedAt)
+          .slice(0, 30)
+
+        // Merge check-ins: dedup by date
+        const checkInMap = new Map<string, CheckIn>()
+        for (const c of existing.checkIns) checkInMap.set(c.date, c)
+        for (const c of cloudCheckIns) checkInMap.set(c.date, c)
+        const mergedCheckIns = Array.from(checkInMap.values())
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+        // Recalculate streaks
+        const sortedCheckIns = [...mergedCheckIns]
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+
+        let currentStreak = 0
+        let longestStreak = 0
+        const today = new Date()
+        let checkDate = new Date(today)
+
+        for (const ci of sortedCheckIns) {
+          const ciDate = new Date(ci.date)
+          const diffDays = Math.floor((checkDate.getTime() - ciDate.getTime()) / (1000 * 60 * 60 * 24))
+
+          if (diffDays <= 1) {
+            currentStreak++
+            longestStreak = Math.max(longestStreak, currentStreak)
+            checkDate = ciDate
+          } else {
+            break
+          }
+        }
+
+        // Only count current streak from today
+        const mostRecent = sortedCheckIns[0]
+        if (mostRecent) {
+          const diffFromToday = Math.floor((today.getTime() - new Date(mostRecent.date).getTime()) / (1000 * 60 * 60 * 24))
+          if (diffFromToday > 1) currentStreak = 0
+        }
+
+        set({
+          sessions: mergedSessions,
+          checkIns: mergedCheckIns,
+          totalSessions: mergedSessions.length,
+          currentStreak,
+          longestStreak: Math.max(longestStreak, existing.longestStreak),
         })
       },
     }),

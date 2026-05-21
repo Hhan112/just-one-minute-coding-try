@@ -3,16 +3,21 @@ import { HomePage } from './pages/HomePage'
 import PracticePage from './pages/PracticePage'
 import ReviewPage from './pages/ReviewPage'
 import HistoryPage from './pages/HistoryPage'
+import LoginPage from './pages/LoginPage'
+import { AuthInitializer } from './components/auth/AuthInitializer'
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/practice" element={<PracticePage />} />
-        <Route path="/review" element={<ReviewPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-      </Routes>
+      <AuthInitializer>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/practice" element={<PracticePage />} />
+          <Route path="/review" element={<ReviewPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </AuthInitializer>
     </BrowserRouter>
   )
 }

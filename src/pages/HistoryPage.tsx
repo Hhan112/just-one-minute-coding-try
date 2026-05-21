@@ -2,8 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { useUserStore } from '../stores/practiceStore'
+import { useAuthStore } from '../stores/authStore'
 import { SessionData } from '../types/practice'
-import { ArrowLeft, Calendar } from 'lucide-react'
+import { ArrowLeft, Calendar, CloudOff } from 'lucide-react'
 
 function SessionCard({ session, onClick }: { session: SessionData; onClick: () => void }) {
   const formatDate = (dateStr: string) => {
@@ -42,6 +43,7 @@ function SessionCard({ session, onClick }: { session: SessionData; onClick: () =
 export default function HistoryPage() {
   const navigate = useNavigate()
   const { sessions, checkIns } = useUserStore()
+  const user = useAuthStore(s => s.user)
 
   const today = new Date()
   const currentMonth = today.getMonth()
@@ -69,6 +71,23 @@ export default function HistoryPage() {
 
       <main className="flex-1 p-6">
         <div className="max-w-xl mx-auto space-y-6">
+          {!user && (
+            <Card className="bg-amber-50 border-amber-200">
+              <div className="flex items-center gap-3">
+                <CloudOff className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
+                  <span className="font-medium">Data is stored locally.</span>{' '}
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="text-amber-700 underline hover:text-amber-900"
+                  >
+                    Sign in
+                  </button>
+                  {' '}to sync your practice history across devices.
+                </div>
+              </div>
+            </Card>
+          )}
           <Card>
             <div className="flex items-center gap-2 mb-4">
               <Calendar className="w-5 h-5 text-blue-500" />

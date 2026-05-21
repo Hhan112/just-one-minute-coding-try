@@ -2,6 +2,7 @@ import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { useNavigate } from 'react-router-dom'
 import { useUserStore } from '../stores/practiceStore'
+import { UserMenu } from '../components/auth/UserMenu'
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -10,9 +11,12 @@ export function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
       <header className="p-6">
-        <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Just a Minute</h1>
-          <p className="text-lg text-gray-600">每日 10 分钟，提升英语口语流利度</p>
+        <div className="max-w-2xl mx-auto">
+          <UserMenu />
+          <div className="text-center mt-4">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Just a Minute</h1>
+            <p className="text-lg text-gray-600">每日 10 分钟，提升英语口语流利度</p>
+          </div>
         </div>
       </header>
 
