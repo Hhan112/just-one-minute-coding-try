@@ -4,7 +4,8 @@ import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { useUserStore } from '../stores/practiceStore'
 import { SessionData, TopicCategory } from '../types/practice'
-import { Play, Pause, RefreshCw, Clock, MessageSquare } from 'lucide-react'
+import { Play, Pause, RefreshCw, Clock, MessageSquare, Sparkles } from 'lucide-react'
+import { AIReviewPanel } from '../components/review/AIReviewPanel'
 
 const categoryImages: Record<TopicCategory, string> = {
   person: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=400&fit=crop',
@@ -271,6 +272,15 @@ export default function ReviewPage() {
           {session.rounds.map((round, index) => (
             <RoundReviewCard key={index} round={round} index={index} />
           ))}
+        </div>
+
+        {/* AI Review Section */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-purple-500" />
+            AI 口语分析
+          </h3>
+          <AIReviewPanel session={session} />
         </div>
 
         {/* Action Buttons */}
